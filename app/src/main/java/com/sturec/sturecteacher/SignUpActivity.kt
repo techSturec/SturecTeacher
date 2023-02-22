@@ -3,32 +3,26 @@ package com.sturec.sturecteacher
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
-import android.util.Log
 import android.widget.Toast
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sturec.sturecteacher.databinding.ActivityLoginBinding
+import com.sturec.sturecteacher.databinding.ActivitySignUpBinding
 
-class LoginActivity : AppCompatActivity() {
+class SignUpActivity : AppCompatActivity() {
 
-    private lateinit var binding: ActivityLoginBinding
+    private lateinit var binding:ActivitySignUpBinding
     private val reference = FirebaseDatabase.getInstance().reference
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
-        binding = ActivityLoginBinding.inflate(layoutInflater)
+        binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
-        binding.loginToSignupButton.setOnClickListener{
-            val intent = Intent(this, SignUpActivity::class.java)
-            startActivity(intent)
-            finish()
-        }
-
-        binding.button.setOnClickListener{
-            val schoolCode = binding.schoolCodeEditText.text.toString()
-            val mail = binding.mailEditText.text.toString()
-            val password = binding.passwordEditText.text.toString()
+        binding.signUpButton.setOnClickListener{
+            val schoolCode = binding.signupSchoolCodeEditText.text.toString()
+            val mail = binding.signupMailEditText.text.toString()
+            val password = binding.signupPasswordEditText.text.toString()
 
             reference.child("schools").child(schoolCode).child("Teacher").get()
                 .addOnSuccessListener {
@@ -40,6 +34,7 @@ class LoginActivity : AppCompatActivity() {
                             a = true
                         }
                     }
+
                     if(!a)
                     {
                         Toast.makeText(
@@ -50,7 +45,7 @@ class LoginActivity : AppCompatActivity() {
                     }else
                     {
                         val instance = FirebaseAuth.getInstance()
-                        instance.signInWithEmailAndPassword(mail,password)
+                        instance.createUserWithEmailAndPassword(mail, password)
                             .addOnSuccessListener {
                                 val intent = Intent(this, MainActivity::class.java)
                                 startActivity(intent)
@@ -66,7 +61,5 @@ class LoginActivity : AppCompatActivity() {
                     }
                 }
         }
-
-
     }
 }
