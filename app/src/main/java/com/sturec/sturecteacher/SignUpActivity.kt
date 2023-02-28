@@ -19,12 +19,19 @@ class SignUpActivity : AppCompatActivity() {
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
 
+        binding.signupToLoginButton.setOnClickListener{
+            val intent = Intent(this, LoginActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+
         binding.signUpButton.setOnClickListener{
             val schoolCode = binding.signupSchoolCodeEditText.text.toString()
             val mail = binding.signupMailEditText.text.toString()
             val password = binding.signupPasswordEditText.text.toString()
 
-            reference.child("schools").child(schoolCode).child("Teacher").get()
+            reference.child("schools").child(schoolCode).child("Teacher")
+                .child("list").get()
                 .addOnSuccessListener {
                     var a = false
                     for(i in it.children)
@@ -47,14 +54,14 @@ class SignUpActivity : AppCompatActivity() {
                         val instance = FirebaseAuth.getInstance()
                         instance.createUserWithEmailAndPassword(mail, password)
                             .addOnSuccessListener {
-                                val intent = Intent(this, MainActivity::class.java)
+                                val intent = Intent(this, HomeActivity::class.java)
                                 startActivity(intent)
                                 finish()
                             }
-                            .addOnFailureListener{
+                            .addOnFailureListener{exception->
                                 Toast.makeText(
                                     this,
-                                    "Could not log you in: ${it.message}",
+                                    "Could not log you in: ${exception.message}",
                                     Toast.LENGTH_LONG
                                 ).show()
                             }

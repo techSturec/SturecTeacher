@@ -14,6 +14,17 @@ class LoginActivity : AppCompatActivity() {
     private lateinit var binding: ActivityLoginBinding
     private val reference = FirebaseDatabase.getInstance().reference
 
+    override fun onStart() {
+        super.onStart()
+        val user = FirebaseAuth.getInstance().currentUser
+        if(user!=null)
+        {
+            val intent = Intent(this, HomeActivity::class.java)
+            startActivity(intent)
+            finish()
+        }
+    }
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         binding = ActivityLoginBinding.inflate(layoutInflater)
@@ -30,9 +41,11 @@ class LoginActivity : AppCompatActivity() {
             val mail = binding.mailEditText.text.toString()
             val password = binding.passwordEditText.text.toString()
 
-            reference.child("schools").child(schoolCode).child("Teacher").get()
+            reference.child("schools").child(schoolCode).child("Teacher")
+                .child("list").get()
                 .addOnSuccessListener {
                     var a = false
+//                    Log.e("teachers", it.children.toString())
                     for(i in it.children)
                     {
                         if(i.value==mail)
@@ -52,7 +65,7 @@ class LoginActivity : AppCompatActivity() {
                         val instance = FirebaseAuth.getInstance()
                         instance.signInWithEmailAndPassword(mail,password)
                             .addOnSuccessListener {
-                                val intent = Intent(this, MainActivity::class.java)
+                                val intent = Intent(this, HomeActivity::class.java)
                                 startActivity(intent)
                                 finish()
                             }
