@@ -9,11 +9,20 @@
         android:id="@+id/navigation_dashboard"
         android:name="com.sturec.sturecteacher.ui.dashboard.DashboardFragment"
         android:label="@string/title_dashboard"
-        tools:layout="@layout/fragment_dashboard" />
+        tools:layout="@layout/fragment_dashboard" >
+        <action
+            android:id="@+id/action_navigation_dashboard_to_classroomFragment"
+            app:destination="@id/classroomFragment" />
+    </fragment>
 
     <fragment
         android:id="@+id/navigation_profile"
         android:name="com.sturec.sturecteacher.ui.profile.ProfileFragment"
         android:label="@string/title_profile"
         tools:layout="@layout/fragment_profile" />
+    <fragment
+        android:id="@+id/classroomFragment"
+        android:name="com.sturec.sturecteacher.ui.dashboard.classroom.ClassroomFragment"
+        android:label="fragment_classroom"
+        tools:layout="@layout/fragment_classroom" />
 </navigation>

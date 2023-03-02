@@ -1,28 +1,39 @@
 package com.sturec.sturecteacher.ui.dashboard
 
 import android.os.Bundle
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.View
 import android.view.ViewGroup
-import android.widget.TextView
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
-import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.rememberScrollState
-import androidx.compose.material3.Button
-import androidx.compose.material3.SnackbarData
-import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.*
+import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.onGloballyPositioned
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.unit.sp
+import androidx.constraintlayout.compose.ConstraintLayout
+import androidx.constraintlayout.compose.Dimension
 import androidx.fragment.app.Fragment
 import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.fragment.findNavController
 import com.google.android.material.snackbar.Snackbar
 import com.sturec.sturecteacher.databinding.FragmentDashboardBinding
 import com.sturec.sturecteacher.util.UiEvents
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
+import com.sturec.sturecteacher.R
 
 class DashboardFragment : Fragment() {
 
@@ -38,18 +49,21 @@ class DashboardFragment : Fragment() {
         savedInstanceState: Bundle?
     ): View {
         val dashboardViewModel =
-            ViewModelProvider(this).get(DashboardViewModel::class.java)
+            ViewModelProvider(this)[DashboardViewModel::class.java]
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
 
         lifecycleScope.launch{
-            dashboardViewModel.uiEvent.collect{
-                when(it)
+            dashboardViewModel.uiEvent.collect{event->
+                when(event)
                 {
                     is UiEvents.ShowSnackbar->{
-                        Snackbar.make(requireView(), it.message, Snackbar.LENGTH_SHORT)
+                        Snackbar.make(requireView(), event.message, Snackbar.LENGTH_SHORT)
                             .show()
+                    }
+                    is UiEvents.Navigate->{
+                        findNavController().navigate(event.actionId)
                     }
                 }
             }
@@ -74,35 +88,130 @@ class DashboardFragment : Fragment() {
 fun ManageClassrooms(
     dashboardViewModel: DashboardViewModel
 ) {
-    Row(
-        modifier = Modifier.horizontalScroll(rememberScrollState())
+//    val localDensity = LocalDensity.current
+//    var constraintLayoutHeight by remember {
+//        mutableStateOf(0f)
+//    }
+    val bottomGuidelineFraction = 0.296f
+//    val heightForBox = with(localDensity) {(constraintLayoutHeight*(1-bottomGuidelineFraction)).toDp()}
+
+    ConstraintLayout(
+        modifier = Modifier
+            .fillMaxSize()
+            .onGloballyPositioned { coordinates ->
+//                constraintLayoutHeight = coordinates.size.height.toFloat()
+            }
     ) {
-        Button(onClick = {
-            dashboardViewModel.onEvent(DashboardEvent.ButtonClicked("classroom"))
-        }
-        ) {
-            Text("classroom")
-        }
+        val (text, buttonRow) = createRefs()
+        val startGuideline = createGuidelineFromStart(0.044f)
+        val bottomGuideline = createGuidelineFromTop(bottomGuidelineFraction)
 
-        Button(onClick = {
-            dashboardViewModel.onEvent(DashboardEvent.ButtonClicked("subjects"))
-        }
-        ) {
-            Text("subjects")
-        }
+        Text(
+            "Classroom management",
+            fontSize = 20.sp,
+            fontWeight = FontWeight.Bold,
+            modifier = Modifier.constrainAs(text){
+                start.linkTo(startGuideline)
+                bottom.linkTo(bottomGuideline)
+            }
+        )
 
-        Button(onClick = {
-            dashboardViewModel.onEvent(DashboardEvent.ButtonClicked("attendance"))
-        }
-        ) {
-            Text("attendance")
-        }
+//        Log.e("height", heightForBox.toString())
 
-        Button(onClick = {
-            dashboardViewModel.onEvent(DashboardEvent.ButtonClicked("announcements"))
-        }
+        Box(
+            modifier = Modifier
+                .constrainAs(buttonRow) {
+                    top.linkTo(text.bottom)
+                    bottom.linkTo(parent.bottom)
+                    start.linkTo(parent.start)
+                    end.linkTo(parent.end)
+                    height = Dimension.fillToConstraints
+                }
+                .fillMaxWidth(),
+//                .height(heightForBox - paddingBetweenTextAndBox),
         ) {
-            Text("announcements")
+            Row(
+                modifier = Modifier
+                    .horizontalScroll(rememberScrollState())
+                    .fillMaxSize(),
+                horizontalArrangement = Arrangement.SpaceEvenly,
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                IconWithTitle(
+                    title = "Classroom",
+                    imageResource = R.drawable.classroom_icon
+                ) {
+                    dashboardViewModel.onEvent(DashboardEvent.OnClassroomButtonClicked)
+                }
+
+                IconWithTitle(
+                    title = "Subjects",
+                    imageResource = R.drawable.bookshelf
+                ) {
+                    dashboardViewModel.onEvent(DashboardEvent.OnSubjectsButtonClicked)
+                }
+
+                IconWithTitle(
+                    title = "Attendance",
+                    imageResource = R.drawable.attendance
+                ){
+                    dashboardViewModel.onEvent(DashboardEvent.OnAttendanceButtonClicked)
+                }
+
+                IconWithTitle(
+                    title = "Bulletin",
+                    imageResource = R.drawable.bulletin
+                ){
+                    dashboardViewModel.onEvent(DashboardEvent.OnBulletinButtonClicked)
+                }
+            }
+        }
+    }
+}
+
+@Composable
+fun IconWithTitle(
+    title:String,
+    imageResource:Int,
+    onClick: ()->Unit
+) {
+    Box(
+        modifier = Modifier.clickable {
+            onClick()
+        }
+    ) {
+        Column(
+            modifier = Modifier
+                .fillMaxHeight()
+                .padding(start = 10.dp, top = 10.dp),
+            horizontalAlignment = Alignment.CenterHorizontally,
+            verticalArrangement = Arrangement.Center
+        ) {
+            Card(
+                modifier = Modifier
+                    .width(50.dp)
+                    .height(50.dp),
+                shape = RoundedCornerShape(12.dp)
+            ) {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                )
+                {
+                    Icon(
+                        painter = painterResource(id = imageResource),
+                        contentDescription = "$title icon",
+                        modifier = Modifier
+                            .fillMaxHeight()
+                    )
+                }
+            }
+
+            Text(
+                title,
+                fontSize = 13.sp,
+                fontWeight = FontWeight.Bold
+            )
         }
     }
 }

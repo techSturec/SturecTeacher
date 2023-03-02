@@ -1,5 +1,8 @@
 package com.sturec.sturecteacher.ui.dashboard
 
 sealed class DashboardEvent {
-    data class ButtonClicked(val title:String) : DashboardEvent()
+    object OnClassroomButtonClicked:DashboardEvent()
+    object OnSubjectsButtonClicked: DashboardEvent()
+    object OnAttendanceButtonClicked: DashboardEvent()
+    object OnBulletinButtonClicked: DashboardEvent()
 }
