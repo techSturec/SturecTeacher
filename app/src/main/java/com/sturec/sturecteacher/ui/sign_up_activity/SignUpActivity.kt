@@ -1,4 +1,4 @@
-package com.sturec.sturecteacher
+package com.sturec.sturecteacher.ui.sign_up_activity
 
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
@@ -9,12 +9,11 @@ import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sturec.sturecteacher.data.user_data.UserDataEntity
-import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
-import com.sturec.sturecteacher.databinding.ActivityLoginBinding
 import com.sturec.sturecteacher.databinding.ActivitySignUpBinding
+import com.sturec.sturecteacher.ui.home_activity.HomeActivity
+import com.sturec.sturecteacher.ui.login_activity.LoginActivity
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
-import javax.inject.Inject
 
 @AndroidEntryPoint
 class SignUpActivity: AppCompatActivity() {

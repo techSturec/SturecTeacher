@@ -1,4 +1,4 @@
-package com.sturec.sturecteacher
+package com.sturec.sturecteacher.ui.sign_up_activity
 
 import androidx.lifecycle.ViewModel
 import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl

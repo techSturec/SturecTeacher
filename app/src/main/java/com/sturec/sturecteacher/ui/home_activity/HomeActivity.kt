@@ -1,4 +1,4 @@
-package com.sturec.sturecteacher
+package com.sturec.sturecteacher.ui.home_activity
 
 import android.os.Bundle
 import android.view.ViewTreeObserver
@@ -7,10 +7,8 @@ import com.google.android.material.bottomnavigation.BottomNavigationView
 import androidx.appcompat.app.AppCompatActivity
 import androidx.constraintlayout.widget.ConstraintLayout
 import androidx.navigation.findNavController
-import androidx.navigation.ui.AppBarConfiguration
-import androidx.navigation.ui.setupActionBarWithNavController
 import androidx.navigation.ui.setupWithNavController
-import com.google.firebase.auth.FirebaseAuth
+import com.sturec.sturecteacher.R
 import com.sturec.sturecteacher.databinding.ActivityHomeBinding
 import dagger.hilt.android.AndroidEntryPoint
 
