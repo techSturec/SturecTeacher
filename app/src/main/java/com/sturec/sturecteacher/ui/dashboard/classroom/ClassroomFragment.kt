@@ -28,7 +28,9 @@ import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.ViewModelProvider
 import com.sturec.sturecteacher.R
 import com.sturec.sturecteacher.databinding.FragmentClassroomBinding
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class ClassroomFragment : Fragment() {
 
     private var _binding: FragmentClassroomBinding? = null

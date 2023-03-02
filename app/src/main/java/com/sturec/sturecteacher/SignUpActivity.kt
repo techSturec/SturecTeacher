@@ -4,12 +4,20 @@ import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.widget.Toast
+import androidx.lifecycle.ViewModelProvider
+import androidx.lifecycle.lifecycleScope
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
+import com.sturec.sturecteacher.data.user_data.UserDataEntity
+import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
 import com.sturec.sturecteacher.databinding.ActivityLoginBinding
 import com.sturec.sturecteacher.databinding.ActivitySignUpBinding
+import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class SignUpActivity : AppCompatActivity() {
+@AndroidEntryPoint
+class SignUpActivity: AppCompatActivity() {
 
     private lateinit var binding:ActivitySignUpBinding
     private val reference = FirebaseDatabase.getInstance().reference
@@ -18,6 +26,7 @@ class SignUpActivity : AppCompatActivity() {
         super.onCreate(savedInstanceState)
         binding = ActivitySignUpBinding.inflate(layoutInflater)
         setContentView(binding.root)
+        val viewModel = ViewModelProvider(this)[SignUpViewModel::class.java]
 
         binding.signupToLoginButton.setOnClickListener{
             val intent = Intent(this, LoginActivity::class.java)
@@ -54,6 +63,9 @@ class SignUpActivity : AppCompatActivity() {
                         val instance = FirebaseAuth.getInstance()
                         instance.createUserWithEmailAndPassword(mail, password)
                             .addOnSuccessListener {
+                                lifecycleScope.launch{
+                                    viewModel.userDataRepositoryImpl.addUserData(UserDataEntity(schoolCode, 1))
+                                }
                                 val intent = Intent(this, HomeActivity::class.java)
                                 startActivity(intent)
                                 finish()

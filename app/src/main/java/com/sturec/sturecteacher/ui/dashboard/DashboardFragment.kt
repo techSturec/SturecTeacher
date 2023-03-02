@@ -34,7 +34,9 @@ import com.sturec.sturecteacher.databinding.FragmentDashboardBinding
 import com.sturec.sturecteacher.util.UiEvents
 import kotlinx.coroutines.launch
 import com.sturec.sturecteacher.R
+import dagger.hilt.android.AndroidEntryPoint
 
+@AndroidEntryPoint
 class DashboardFragment : Fragment() {
 
     private var _binding: FragmentDashboardBinding? = null
@@ -53,6 +55,12 @@ class DashboardFragment : Fragment() {
 
         _binding = FragmentDashboardBinding.inflate(inflater, container, false)
         val root: View = binding.root
+
+        binding.testUserData.setOnClickListener{
+            lifecycleScope.launch{
+                Log.e("testing get user",dashboardViewModel.userDataRepositoryImpl.getUserData(1).toString())
+            }
+        }
 
         lifecycleScope.launch{
             dashboardViewModel.uiEvent.collect{event->

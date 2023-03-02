@@ -5,12 +5,18 @@ import androidx.lifecycle.MutableLiveData
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.sturec.sturecteacher.R
+import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
 import com.sturec.sturecteacher.util.UiEvents
+import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
+import javax.inject.Inject
 
-class DashboardViewModel : ViewModel() {
+@HiltViewModel
+class DashboardViewModel @Inject constructor(
+    val userDataRepositoryImpl: UserDataRepositoryImpl
+): ViewModel() {
 
     private val _text = MutableLiveData<String>().apply {
         value = "This is dashboard Fragment"
