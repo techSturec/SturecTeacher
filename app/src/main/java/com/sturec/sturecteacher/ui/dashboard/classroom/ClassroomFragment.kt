@@ -424,7 +424,7 @@ fun ClassroomFragmentUi(
                 modifier = Modifier.constrainAs(refreshFab){
                     end.linkTo(addStudentsButton.start)
                     centerVerticallyTo(parent, 0.9475f)
-                },
+                }.padding(end = 8.dp),
                 contentColor = Color.Red,
                 containerColor = Color(0xFFFFD8D8),
             ) {
