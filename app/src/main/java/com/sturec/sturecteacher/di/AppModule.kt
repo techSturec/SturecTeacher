@@ -3,6 +3,7 @@ package com.sturec.sturecteacher.di
 import android.app.Application
 import androidx.room.Room
 import com.sturec.sturecteacher.data.classroom_operations.ClassroomOperationsRepositoryImpl
+import com.sturec.sturecteacher.data.subject_operations.SubjectOperationsRepositoryImpl
 import com.sturec.sturecteacher.data.user_data.UserDataDatabase
 import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
 import dagger.Module
@@ -36,5 +37,11 @@ object AppModule {
     fun provideClassroomOperationsRepository
                 (userDataRepositoryImpl:UserDataRepositoryImpl):ClassroomOperationsRepositoryImpl{
         return ClassroomOperationsRepositoryImpl(userDataRepositoryImpl)
+    }
+
+    @Provides
+    @Singleton
+    fun provideSubjectOperationsRepository(userDataDatabase: UserDataDatabase):SubjectOperationsRepositoryImpl{
+        return SubjectOperationsRepositoryImpl(userDataDatabase.dao)
     }
 }

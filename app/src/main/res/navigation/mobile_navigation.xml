@@ -13,6 +13,9 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_classroomFragment"
             app:destination="@id/classroomFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_subjectsFragment"
+            app:destination="@id/subjectsFragment" />
     </fragment>
 
     <fragment
@@ -25,4 +28,9 @@
         android:name="com.sturec.sturecteacher.ui.dashboard.classroom.ClassroomFragment"
         android:label="fragment_classroom"
         tools:layout="@layout/fragment_classroom" />
+    <fragment
+        android:id="@+id/subjectsFragment"
+        android:name="com.sturec.sturecteacher.ui.dashboard.subjects.SubjectsFragment"
+        android:label="fragment_subjects"
+        tools:layout="@layout/fragment_subjects" />
 </navigation>

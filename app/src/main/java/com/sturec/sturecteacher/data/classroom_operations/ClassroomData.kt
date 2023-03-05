@@ -5,5 +5,5 @@ data class ClassroomData(
     val section: String = "",
     val inChargeMail: String = "",
     val className:String = "",
-    val listOfStudents: MutableList<StudentData> = mutableListOf()
+    val listOfStudents: MutableMap<String, StudentData> = mutableMapOf()
 )

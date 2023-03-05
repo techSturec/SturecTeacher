@@ -37,7 +37,7 @@ class DashboardViewModel @Inject constructor(
             }
             is DashboardEvent.OnSubjectsButtonClicked->{
                 viewModelScope.launch {
-                    _uiEvent.send(UiEvents.ShowSnackbar("Subjects"))
+                    _uiEvent.send(UiEvents.Navigate(R.id.action_navigation_dashboard_to_subjectsFragment))
                 }
             }
             is DashboardEvent.OnAttendanceButtonClicked->{

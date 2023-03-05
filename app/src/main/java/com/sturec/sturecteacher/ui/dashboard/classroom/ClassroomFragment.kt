@@ -44,6 +44,7 @@ import com.sturec.sturecteacher.data.classroom_operations.ClassroomData
 import com.sturec.sturecteacher.data.classroom_operations.StudentData
 import com.sturec.sturecteacher.data.classroom_operations.TeacherAssignedClassroomData
 import com.sturec.sturecteacher.databinding.FragmentClassroomBinding
+import com.sturec.sturecteacher.ui.theme.AppTheme
 import com.sturec.sturecteacher.util.UiEvents
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.flow.collect
@@ -86,7 +87,9 @@ class ClassroomFragment : Fragment() {
         binding.classroomComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                ClassroomFragmentUi(viewModel)
+                AppTheme(useDarkTheme = false) {
+                    ClassroomFragmentUi(viewModel)
+                }
             }
         }
 
@@ -254,13 +257,15 @@ fun ClassroomFragmentUi(
                 }
 
                 dataMap.value[classroomList[selectedButton].className]?.let {
-                    items(it.listOfStudents.size) {i:Int->
-                        val temp = it.listOfStudents[i]
-                        TableListItem(
-                            temp.rollNo,
-                            temp.studentName,
-                            temp.admissionNo
-                        )
+                    for(i in it.listOfStudents.iterator()) {
+                        item {
+                            val temp = i.value
+                            TableListItem(
+                                temp.rollNo,
+                                temp.studentName,
+                                temp.admissionNo
+                            )
+                        }
                     }
                 }
             }
@@ -421,10 +426,12 @@ fun ClassroomFragmentUi(
                 onClick = {
                     flag = !flag
                 },
-                modifier = Modifier.constrainAs(refreshFab){
-                    end.linkTo(addStudentsButton.start)
-                    centerVerticallyTo(parent, 0.9475f)
-                }.padding(end = 8.dp),
+                modifier = Modifier
+                    .constrainAs(refreshFab) {
+                        end.linkTo(addStudentsButton.start)
+                        centerVerticallyTo(parent, 0.9475f)
+                    }
+                    .padding(end = 8.dp),
                 contentColor = Color.Red,
                 containerColor = Color(0xFFFFD8D8),
             ) {

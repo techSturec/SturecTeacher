@@ -48,6 +48,7 @@ class ClassroomOperationsRepositoryImpl(
     }
 
     override fun addStudent(data: StudentData) = callbackFlow{
+        // TODO: add students list to room databse
         val schoolCode = userDataRepositoryImpl.getUserData(1)!!.schoolCode
 
         val sessionName = reference.child("sessionName").get().await().value.toString()
@@ -57,15 +58,15 @@ class ClassroomOperationsRepositoryImpl(
             .child(sessionName).child(data.standard.toString()).child(data.section).child("listOfStudents")
 
 
-        val listOfStudent = mutableListOf<StudentData>()
+        val listOfStudent = mutableMapOf<String, StudentData>()
         val receivedData = ref.get().await()
         for(i in receivedData.children)
         {
             i.getValue(StudentData::class.java)?.let {
-                listOfStudent.add(it)
+                listOfStudent[it.rollNo] = it
             }
         }
-        listOfStudent.add(data)
+        listOfStudent[data.rollNo] = data
 
 
         ref.setValue(listOfStudent).addOnFailureListener{
