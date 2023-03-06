@@ -41,6 +41,7 @@ import com.sturec.sturecteacher.ui.dashboard.classroom.TableListItem
 import com.sturec.sturecteacher.ui.theme.AppTheme
 import com.sturec.sturecteacher.ui.theme.md_theme_light_primary50
 import com.sturec.sturecteacher.ui.theme.primary90
+import com.sturec.sturecteacher.util.StringHashing
 import com.sturec.sturecteacher.util.UiEvents
 import dagger.hilt.android.AndroidEntryPoint
 import kotlinx.coroutines.launch
@@ -118,10 +119,10 @@ fun SubjectsFragmentUi(
 
     val initialList = mutableListOf(
         TeacherAssignedClassroomData(
-        1,
-        "A",
-        "",
-        "Loading"
+            1,
+            "A",
+            "",
+            "Loading"
         )
     )
 
@@ -133,7 +134,9 @@ fun SubjectsFragmentUi(
     var selectedButton by remember {
         mutableStateOf(classroomList.value[0])
     }
-
+    var flag by remember {
+        mutableStateOf(true)
+    }
 
 
 //    Log.e("get classroom test", classroomList.value.toString())
@@ -193,14 +196,14 @@ fun SubjectsFragmentUi(
                 .horizontalScroll(rememberScrollState()),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            if(selectedButton==initialList[0])
-            {
+            if (selectedButton == initialList[0]) {
                 selectedButton = classroomList.value[0]
             }
             for (i in classroomList.value) {
                 Button(
                     onClick = {
                         selectedButton = i
+                        flag = !flag
                     },
                     colors = ButtonDefaults.buttonColors(
                         containerColor = if (selectedButton == i) {
@@ -228,7 +231,7 @@ fun SubjectsFragmentUi(
 
 
 
-        if (classroomList.value==initialList) {
+        if (classroomList.value == initialList) {
             CircularProgressIndicator(
                 color = MaterialTheme.colorScheme.onPrimaryContainer,
                 modifier = Modifier.constrainAs(loadingIcon) {
@@ -237,23 +240,19 @@ fun SubjectsFragmentUi(
                 }
             )
         } else {
-            var flag by remember {
-                mutableStateOf(true)
-            }
-            var subjectsData:State<List<SubjectData>>
-            if(flag)
-            {
+            var subjectsData: State<List<SubjectData>>
+            if (flag) {
                 subjectsData = viewModel.subjectOperationsRepositoryImpl
                     .getAllSubjectsData(selectedButton).collectAsState(initial = emptyList())
-            }else
-            {
+            } else {
                 subjectsData = viewModel.subjectOperationsRepositoryImpl
                     .getAllSubjectsData(selectedButton).collectAsState(initial = emptyList())
             }
+            val emptySubjectData = listOf(SubjectData())
+//            Log.e("loading issue", subjectsData.value.toString())
 
 
-            if(subjectsData.value.isEmpty())
-            {
+            if (subjectsData.value.isEmpty()) {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.constrainAs(loadingIcon2) {
@@ -261,10 +260,13 @@ fun SubjectsFragmentUi(
                         centerVerticallyTo(parent)
                     }
                 )
-            }else
-            {
+            } else {
                 Text(
-                    text = "Total Subjects: - ${subjectsData.value.size}",
+                    text = if (subjectsData.value != emptySubjectData) {
+                        "Total Subjects: - ${subjectsData.value.size}"
+                    } else {
+                        "No Subject Created Yet!"
+                    },
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.constrainAs(totalStudents) {
                         top.linkTo(classRow.bottom, margin = 10.dp)
@@ -291,13 +293,15 @@ fun SubjectsFragmentUi(
                         modifier = Modifier
                     ) {
                         items(subjectsData.value.size) {
-                            TableItem(
-                                SubjectData(
-                                    subjectName =  subjectsData.value[it].subjectName,
-                                    teacherName = subjectsData.value[it].teacherName,
-                                    teacherMail = subjectsData.value[it].teacherMail
+                            if (subjectsData.value != emptySubjectData) {
+                                TableItem(
+                                    SubjectData(
+                                        subjectName = subjectsData.value[it].subjectName,
+                                        teacherName = subjectsData.value[it].teacherName,
+                                        teacherMail = subjectsData.value[it].teacherMail
+                                    )
                                 )
-                            )
+                            }
                         }
                     }
                 }
@@ -453,6 +457,7 @@ fun SubjectsFragmentUi(
                                             classroomData = selectedButton
                                         )
                                     )
+//                                    Log.e("testing hash", GuavaTest().testHashingSha256(teacherEmailField))
 
                                     flag = !flag
 
