@@ -4,7 +4,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface ClassroomOperationsRepository {
     fun getAssignedClassroomsList(): Flow<MutableList<TeacherAssignedClassroomData>>
-    fun getAllClassroomsData(data: List<TeacherAssignedClassroomData>):Flow<MutableMap<String, ClassroomData>>
+    fun getAllClassroomsData(data: TeacherAssignedClassroomData):Flow<ClassroomData>
 
     fun addStudent(data:StudentData): Flow<Boolean>
 }

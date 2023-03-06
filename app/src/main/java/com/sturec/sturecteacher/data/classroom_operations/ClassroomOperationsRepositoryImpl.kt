@@ -1,5 +1,6 @@
 package com.sturec.sturecteacher.data.classroom_operations
 
+import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
@@ -30,46 +31,54 @@ class ClassroomOperationsRepositoryImpl(
         awaitClose()
     }
 
-    override fun getAllClassroomsData(data: List<TeacherAssignedClassroomData>) = callbackFlow {
+    override fun getAllClassroomsData(data: TeacherAssignedClassroomData) = callbackFlow {
         val schoolCode = userDataRepositoryImpl.getUserData(1)!!.schoolCode
-        val dataMap: MutableMap<String, ClassroomData> = mutableMapOf()
+//        val dataMap: MutableMap<String, ClassroomData> = mutableMapOf()
         val sessionName = reference.child("sessionName").get().await().value.toString()
 
-        for (i in data) {
-            val result = reference.child("schools").child(schoolCode)
-                .child("Classroom").child(sessionName).child(i.standard.toString())
-                .child(i.section).get().await().getValue(ClassroomData::class.java)
-            dataMap[i.className] = result!!
-        }
 
-        trySend(dataMap)
+        val result = reference.child("schools").child(schoolCode)
+            .child("Classroom").child(sessionName).child(data.standard.toString())
+            .child(data.section)
+            .get()
+            .await()
+            .getValue(ClassroomData::class.java)
+//        dataMap[data.className] = result!!
+
+//        Log.e("result", result.toString())
+
+        trySend(result!!)
 
         awaitClose()
     }
 
-    override fun addStudent(data: StudentData) = callbackFlow{
-        // TODO: add students list to room databse
+    override fun addStudent(data: StudentData) = callbackFlow {
+        // TODO: add students list to room database
         val schoolCode = userDataRepositoryImpl.getUserData(1)!!.schoolCode
 
         val sessionName = reference.child("sessionName").get().await().value.toString()
 
 //        Log.e("data", data.toString())
         val ref = reference.child("schools").child(schoolCode).child("Classroom")
-            .child(sessionName).child(data.standard.toString()).child(data.section).child("listOfStudents")
+            .child(sessionName).child(data.standard.toString()).child(data.section)
+            .child("listOfStudents")
 
 
-        val listOfStudent = mutableMapOf<String, StudentData>()
+        val listOfStudent = mutableListOf<StudentData>()
         val receivedData = ref.get().await()
-        for(i in receivedData.children)
-        {
+        for (i in receivedData.children) {
             i.getValue(StudentData::class.java)?.let {
-                listOfStudent[it.rollNo] = it
+                listOfStudent.add(it)
             }
         }
-        listOfStudent[data.rollNo] = data
+        listOfStudent.add(data)
+
+        listOfStudent.sortBy {
+            it.rollNo
+        }
 
 
-        ref.setValue(listOfStudent).addOnFailureListener{
+        ref.setValue(listOfStudent).addOnFailureListener {
             trySend(false)
         }.addOnSuccessListener {
             trySend(true)
