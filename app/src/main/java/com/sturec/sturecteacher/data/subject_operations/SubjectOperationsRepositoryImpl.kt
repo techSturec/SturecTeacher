@@ -36,11 +36,8 @@ class SubjectOperationsRepositoryImpl(
 
         list.add(subjectData)
 
-
         ref.setValue(list).addOnFailureListener{
             trySend(false)
-        }.addOnSuccessListener {
-            trySend(true)
         }
 
         awaitClose()
