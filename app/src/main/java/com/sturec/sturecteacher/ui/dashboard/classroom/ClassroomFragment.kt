@@ -10,6 +10,7 @@ import androidx.compose.foundation.*
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.icons.Icons
@@ -28,7 +29,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.modifier.modifierLocalConsumer
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -39,10 +42,7 @@ import androidx.lifecycle.ViewModelProvider
 import androidx.lifecycle.lifecycleScope
 import com.google.android.material.snackbar.Snackbar
 import com.sturec.sturecteacher.R
-import com.sturec.sturecteacher.data.classroom_operations.AssignedClassroom
-import com.sturec.sturecteacher.data.classroom_operations.ClassroomData
-import com.sturec.sturecteacher.data.classroom_operations.StudentData
-import com.sturec.sturecteacher.data.classroom_operations.TeacherAssignedClassroomData
+import com.sturec.sturecteacher.data.classroom_operations.*
 import com.sturec.sturecteacher.databinding.FragmentClassroomBinding
 import com.sturec.sturecteacher.ui.theme.AppTheme
 import com.sturec.sturecteacher.util.UiEvents
@@ -87,7 +87,7 @@ class ClassroomFragment : Fragment() {
         binding.classroomComposeView.apply {
             setViewCompositionStrategy(ViewCompositionStrategy.DisposeOnViewTreeLifecycleDestroyed)
             setContent {
-                AppTheme(useDarkTheme = false) {
+                AppTheme(useDarkTheme = isSystemInDarkTheme()) {
                     ClassroomFragmentUi(viewModel)
                 }
             }
@@ -120,13 +120,13 @@ fun ClassroomFragmentUi(
 //            initial = emptyMap()
 //        )
 
-    val initialDataMap = ClassroomData()
+    val initialDataMap = mutableListOf(ClassroomListStudentData())
 
     var studentNameField by remember {
         mutableStateOf("")
     }
 
-    var admissionNoField by remember {
+    var mailField by remember {
         mutableStateOf("")
     }
 
@@ -159,11 +159,11 @@ fun ClassroomFragmentUi(
                 color = MaterialTheme.colorScheme.onPrimaryContainer
             )
         } else {
-            var dataMap: State<ClassroomData> = if (flag) {
+            var dataMap: State<MutableList<ClassroomListStudentData>> = if (flag) {
                 viewModel.classroomOperationsRepository.getAllClassroomsData(classroomList[selectedButton])
                     .collectAsState(
-                        initial = initialDataMap
-                    )
+                    initial = initialDataMap
+                )
             } else {
                 viewModel.classroomOperationsRepository.getAllClassroomsData(classroomList[selectedButton])
                     .collectAsState(
@@ -175,6 +175,7 @@ fun ClassroomFragmentUi(
                 Text(
                     text = "Classroom Management",
                     fontWeight = FontWeight.SemiBold,
+                    color = MaterialTheme.colorScheme.onPrimaryContainer,
                     fontSize = 20.sp,
                     modifier = Modifier.constrainAs(heading) {
 //                bottom.linkTo(headingBottomGuideLine)
@@ -209,9 +210,9 @@ fun ClassroomFragmentUi(
                                     .padding(end = 10.dp),
                                 colors = ButtonDefaults.buttonColors(
                                     containerColor = if (selectedButton == it) {
-                                        Color(0xFFFF6666)
+                                        MaterialTheme.colorScheme.primary
                                     } else {
-                                        Color(0xFFFFD8D8)
+                                        MaterialTheme.colorScheme.primaryContainer
                                     }
                                 )
 
@@ -222,7 +223,11 @@ fun ClassroomFragmentUi(
                                 ) {
                                     Text(
                                         text = classroomList[it].className,
-                                        color = Color.Black
+                                        color = if(selectedButton==it){
+                                            MaterialTheme.colorScheme.onPrimary
+                                        }else{
+                                            MaterialTheme.colorScheme.onPrimaryContainer
+                                        }
                                     )
                                 }
                             }
@@ -231,8 +236,9 @@ fun ClassroomFragmentUi(
                 }
 
                 Text(
-                    text = dataMap.value.listOfStudents.size.toString() + " Student(s)",
-                    color = Color.Red,
+                    text = dataMap.value.size.toString() + " Student(s)",
+                    fontWeight = FontWeight.Bold,
+                    color = MaterialTheme.colorScheme.primary,
                     modifier = Modifier
                         .constrainAs(totalStudentRow) {
                             top.linkTo(classRow.bottom)
@@ -255,16 +261,16 @@ fun ClassroomFragmentUi(
                         .padding(horizontal = 10.dp)
                 ) {
 
-                    item {
-                        TableListItem()
-                    }
+//                    item {
+//                        TableListItem()
+//                    }
 
-                    for (i in dataMap.value.listOfStudents) {
+                    for (i in dataMap.value) {
                         item {
                             TableListItem(
                                 i.rollNo,
                                 i.studentName,
-                                i.admissionNo
+                                i.mail
                             )
                         }
                     }
@@ -326,15 +332,15 @@ fun ClassroomFragmentUi(
                                 )
 
                                 TextField(
-                                    value = admissionNoField,
+                                    value = mailField,
                                     onValueChange = {
-                                        admissionNoField = it
+                                        mailField = it.replace(" ", "")
                                     },
                                     placeholder = {
-                                        Text("Add Admission No.")
+                                        Text("Add Mail")
                                     },
                                     label = {
-                                        Text("Admission No.")
+                                        Text("Mail")
                                     },
                                     singleLine = true,
                                     trailingIcon = {
@@ -342,11 +348,10 @@ fun ClassroomFragmentUi(
                                             imageVector = Icons.Default.Close,
                                             contentDescription = "clear admission no",
                                             modifier = Modifier.clickable {
-                                                admissionNoField = ""
+                                                mailField = ""
                                             }
                                         )
                                     },
-                                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Number),
                                     modifier = Modifier.padding(bottom = 24.dp)
                                 )
 
@@ -381,7 +386,7 @@ fun ClassroomFragmentUi(
                                     viewModel.onEvent(
                                         ClassroomEvents.OnSaveStudentButtonClicked(
                                             StudentData(
-                                                admissionNo = admissionNoField,
+                                                mail = mailField,
                                                 rollNo = rollNoField,
                                                 studentName = studentNameField,
                                                 standard = classroomList[selectedButton].standard,
@@ -391,7 +396,7 @@ fun ClassroomFragmentUi(
                                         )
                                     )
                                 },
-                                enabled = admissionNoField.isNotEmpty() && rollNoField.isNotEmpty() && studentNameField.isNotEmpty(),
+                                enabled = mailField.isNotEmpty() && rollNoField.isNotEmpty() && studentNameField.isNotEmpty(),
                                 modifier = Modifier.padding(bottom = 8.dp)
                             ) {
                                 Icon(
@@ -461,9 +466,108 @@ fun ClassroomFragmentUi(
 
 @Composable
 fun TableListItem(
+    rollNo: String,
+    studentName: String,
+    mail: String
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 120.dp)
+            .padding(vertical = 11.dp),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.width(30.dp))
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ){
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                studentName,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                                    .padding(top = 10.dp, start = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                            Text(
+                                "Mail: - $mail",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .padding(top = 3.dp, start = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+
+                            Text(
+                                "Roll No: - $rollNo",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .padding(top = 3.dp, start = 5.dp, bottom = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.CenterStart
+        ){
+            Card(
+                modifier = Modifier
+                    .width(60.dp)
+                    .height(60.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                )
+//                backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+            ){
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.goal
+                    ),
+                    contentDescription = "Icon",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun TableListItemAlt(
     rollNo: String = "Roll No.",
     studentName: String = "Student Name",
-    admissionNo: String = "Admission No."
+    mail: String = "Mail"
 ) {
     Row {
         Column(
@@ -483,7 +587,7 @@ fun TableListItem(
 //                                .background(Color.Red),
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
-            Text(admissionNo)
+            Text(mail)
         }
 
         Column(

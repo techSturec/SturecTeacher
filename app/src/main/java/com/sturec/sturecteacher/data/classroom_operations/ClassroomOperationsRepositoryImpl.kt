@@ -4,6 +4,7 @@ import android.util.Log
 import com.google.firebase.auth.FirebaseAuth
 import com.google.firebase.database.FirebaseDatabase
 import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
+import com.sturec.sturecteacher.util.StringHashing
 import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
@@ -14,6 +15,7 @@ class ClassroomOperationsRepositoryImpl(
 
     private val reference = FirebaseDatabase.getInstance().reference
     private val authInstance = FirebaseAuth.getInstance()
+    private val hashing = StringHashing()
 
     override fun getAssignedClassroomsList() = callbackFlow {
         val schoolCode = userDataRepositoryImpl.getUserData(1)!!.schoolCode
@@ -39,15 +41,21 @@ class ClassroomOperationsRepositoryImpl(
 
         val result = reference.child("schools").child(schoolCode)
             .child("Classroom").child(sessionName).child(data.standard.toString())
-            .child(data.section)
+            .child(data.section).child("listOfStudents")
             .get()
             .await()
-            .getValue(ClassroomData::class.java)
+
+        val listOfStudents = mutableListOf<ClassroomListStudentData>()
+
+        for(i in result.children)
+        {
+            listOfStudents.add(i.getValue(ClassroomListStudentData::class.java)!!)
+        }
 //        dataMap[data.className] = result!!
 
 //        Log.e("result", result.toString())
 
-        trySend(result!!)
+        trySend(listOfStudents)
 
         awaitClose()
     }
@@ -58,31 +66,44 @@ class ClassroomOperationsRepositoryImpl(
 
         val sessionName = reference.child("sessionName").get().await().value.toString()
 
+        var check = true
+
+        val studentRef = reference.child("schools").child(schoolCode)
+            .child("Student").child("profiles")
+            .child(hashing.createHash(data.mail))
+
+        val studentData = studentRef.get().await().getValue(StudentData::class.java)
+
+        studentData?.let {
+            studentData.rollNo = data.rollNo
+            studentData.className = data.className
+            studentData.section = data.section
+            studentData.standard = data.standard
+            studentData.studentName = data.studentName
+
+            studentRef.setValue(studentData).addOnFailureListener {
+                check = false
+            }.await()
+        }
+
 //        Log.e("data", data.toString())
         val ref = reference.child("schools").child(schoolCode).child("Classroom")
             .child(sessionName).child(data.standard.toString()).child(data.section)
-            .child("listOfStudents")
+            .child("listOfStudents").child(hashing.createHash(data.mail))
 
 
-        val listOfStudent = mutableListOf<StudentData>()
-        val receivedData = ref.get().await()
-        for (i in receivedData.children) {
-            i.getValue(StudentData::class.java)?.let {
-                listOfStudent.add(it)
-            }
-        }
-        listOfStudent.add(data)
-
-        listOfStudent.sortBy {
-            it.rollNo
-        }
+        ref.setValue(
+            ClassroomListStudentData(
+                mail = data.mail,
+                rollNo = data.rollNo,
+                studentName = data.studentName
+            )
+        ).addOnFailureListener{
+            check = false
+        }.await()
 
 
-        ref.setValue(listOfStudent).addOnFailureListener {
-            trySend(false)
-        }.addOnSuccessListener {
-            trySend(true)
-        }
+        trySend(check)
 
 //        trySend(false)
         awaitClose()

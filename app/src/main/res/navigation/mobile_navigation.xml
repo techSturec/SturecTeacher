@@ -16,6 +16,12 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_subjectsFragment"
             app:destination="@id/subjectsFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_bulletinFragment"
+            app:destination="@id/bulletinFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_attendanceFragment"
+            app:destination="@id/attendanceFragment" />
     </fragment>
 
     <fragment
@@ -33,4 +39,18 @@
         android:name="com.sturec.sturecteacher.ui.dashboard.subjects.SubjectsFragment"
         android:label="fragment_subjects"
         tools:layout="@layout/fragment_subjects" />
+    <fragment
+        android:id="@+id/bulletinFragment"
+        android:name="com.sturec.sturecteacher.ui.dashboard.bulletin.BulletinFragment"
+        android:label="fragment_bulletin"
+        tools:layout="@layout/fragment_bulletin" />
+    <fragment
+        android:id="@+id/attendanceFragment"
+        android:name="com.sturec.sturecteacher.ui.dashboard.attendance.AttendanceFragment"
+        android:label="fragment_attendance"
+        tools:layout="@layout/fragment_attendance" >
+        <action
+            android:id="@+id/action_attendanceFragment_to_navigation_dashboard"
+            app:destination="@id/navigation_dashboard" />
+    </fragment>
 </navigation>

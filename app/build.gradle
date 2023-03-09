@@ -93,4 +93,9 @@ dependencies {
     implementation("com.google.guava:guava:31.1-android")
 
 
+    //setValue problem in state
+    implementation "androidx.compose.runtime:runtime:1.3.3"
+    implementation "androidx.compose.runtime:runtime-livedata:1.3.3"
+
+
 }

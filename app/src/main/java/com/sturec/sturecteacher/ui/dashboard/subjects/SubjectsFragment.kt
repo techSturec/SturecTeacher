@@ -22,6 +22,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.ViewCompositionStrategy
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.unit.dp
@@ -529,6 +530,103 @@ fun SubjectsFragmentUi(
 
 @Composable
 fun TableItem(
+    subjectData: SubjectData
+) {
+    Box(
+        modifier = Modifier
+            .fillMaxWidth()
+            .defaultMinSize(minHeight = 120.dp)
+            .padding(vertical = 11.dp),
+        contentAlignment = Alignment.Center
+    ) {
+
+        Row(
+            modifier = Modifier.fillMaxSize()
+        ) {
+            Spacer(modifier = Modifier.width(30.dp))
+            Card(
+                colors = CardDefaults.cardColors(
+                    containerColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                ),
+                shape = RoundedCornerShape(16.dp),
+                elevation = CardDefaults.cardElevation(
+                    defaultElevation = 10.dp
+                )
+            ) {
+                Box(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    Row(
+                        modifier = Modifier.fillMaxSize()
+                    ) {
+                        Spacer(modifier = Modifier.width(40.dp))
+                        Column(
+                            modifier = Modifier.fillMaxSize(),
+                            horizontalAlignment = Alignment.Start
+                        ) {
+                            Text(
+                                subjectData.subjectName,
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 22.sp,
+                                fontWeight = FontWeight.SemiBold,
+                                modifier = Modifier
+                                    .padding(top = 10.dp, start = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                            Text(
+                                "Teacher Name: - ${subjectData.teacherName}",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .padding(top = 3.dp, start = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+
+                            Text(
+                                "Teacher Mail: - ${subjectData.teacherMail}",
+                                color = MaterialTheme.colorScheme.onPrimaryContainer,
+                                fontSize = 14.sp,
+                                modifier = Modifier
+                                    .padding(top = 3.dp, start = 5.dp, bottom = 5.dp)
+                                    .horizontalScroll(rememberScrollState())
+                            )
+                        }
+                    }
+                }
+            }
+
+        }
+
+        Box(
+            modifier = Modifier.fillMaxSize(),
+            contentAlignment = Alignment.CenterStart
+        ) {
+            Card(
+                modifier = Modifier
+                    .width(60.dp)
+                    .height(60.dp),
+                shape = RoundedCornerShape(14.dp),
+                colors = CardDefaults.cardColors(
+                    MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+                )
+//                backgroundColor = MaterialTheme.colorScheme.surfaceColorAtElevation(5.dp)
+            ) {
+                Image(
+                    painter = painterResource(
+                        id = R.drawable.goal
+                    ),
+                    contentDescription = "Icon",
+                    modifier = Modifier.fillMaxSize()
+                )
+            }
+        }
+    }
+}
+
+
+@Composable
+fun TableItemAlt(
     subjectData: SubjectData
 ) {
     val cardColor = CardDefaults.cardColors(

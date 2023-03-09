@@ -42,12 +42,12 @@ class DashboardViewModel @Inject constructor(
             }
             is DashboardEvent.OnAttendanceButtonClicked->{
                 viewModelScope.launch {
-                    _uiEvent.send(UiEvents.ShowSnackbar("Attendance"))
+                    _uiEvent.send(UiEvents.Navigate(R.id.action_navigation_dashboard_to_attendanceFragment))
                 }
             }
             is DashboardEvent.OnBulletinButtonClicked->{
                 viewModelScope.launch {
-                    _uiEvent.send(UiEvents.ShowSnackbar("Bulletin"))
+                    _uiEvent.send(UiEvents.Navigate(R.id.action_navigation_dashboard_to_bulletinFragment))
                 }
             }
         }
