@@ -207,12 +207,12 @@ fun BulletinFragmentUi(
             ) {
                 items(listOfAnnouncements.value.size) {
                     val temp = listOfAnnouncements.value[it]
-                    val date = LocalDate.parse(temp.first)
+                    val date = temp.first
                     Text(
                         text = if (date == todayDate) {
                             "Today"
                         } else {
-                            date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.SHORT))
+                            date.format(DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG))
                         },
                         modifier = Modifier.padding(top = 30.dp)
                     )

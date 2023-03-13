@@ -395,6 +395,12 @@ fun ClassroomFragmentUi(
                                             )
                                         )
                                     )
+
+                                    studentNameField = ""
+                                    mailField = ""
+                                    rollNoField = ""
+                                    fabClicked = false
+
                                 },
                                 enabled = mailField.isNotEmpty() && rollNoField.isNotEmpty() && studentNameField.isNotEmpty(),
                                 modifier = Modifier.padding(bottom = 8.dp)

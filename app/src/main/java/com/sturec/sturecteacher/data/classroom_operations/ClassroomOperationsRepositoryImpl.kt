@@ -51,6 +51,10 @@ class ClassroomOperationsRepositoryImpl(
         {
             listOfStudents.add(i.getValue(ClassroomListStudentData::class.java)!!)
         }
+
+        listOfStudents.sortBy {
+            it.rollNo
+        }
 //        dataMap[data.className] = result!!
 
 //        Log.e("result", result.toString())

@@ -8,6 +8,7 @@ import kotlinx.coroutines.channels.awaitClose
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
+import java.time.LocalDate
 
 class BulletinRepositoryImpl(
     private val userDataDao: UserDataDao
@@ -22,7 +23,7 @@ class BulletinRepositoryImpl(
         val data = reference.child("schools").child(schoolCode).child("Teacher")
             .child("announcements").get().await()
 
-        val list:MutableList<Pair<String, MutableList<AnnouncementData>>> = mutableListOf()
+        var list:MutableList<Pair<LocalDate, MutableList<AnnouncementData>>> = mutableListOf()
 
         for (i in data.children) {
             //dates
@@ -34,11 +35,16 @@ class BulletinRepositoryImpl(
             }
             list.add(
                 Pair(
-                    i.key.toString(),
+                    LocalDate.parse(i.key.toString()),
                     dateList
                 )
             )
         }
+
+        list.sortByDescending {
+            it.first
+        }
+
 
         trySend(list)
 
