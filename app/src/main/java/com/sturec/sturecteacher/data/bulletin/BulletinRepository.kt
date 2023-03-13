@@ -4,5 +4,5 @@ import kotlinx.coroutines.flow.Flow
 
 interface BulletinRepository {
 
-    fun getAllAnnouncements(): Flow<MutableList<AnnouncementData>>
+    fun getAllAnnouncements(): Flow< MutableList <Pair <String, MutableList <AnnouncementData> > > >
 }

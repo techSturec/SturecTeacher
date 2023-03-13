@@ -25,21 +25,21 @@ class SubjectOperationsRepositoryImpl(
         val sessionName = reference.child("sessionName").get().await().value.toString()
         val ref = reference.child("schools").child(schoolCode).child("Classroom")
             .child(sessionName).child(classroomData.standard.toString())
-            .child(classroomData.section).child("subjects")
-        val list = mutableListOf<SubjectData>()
+            .child(classroomData.section).child("subjects").child(subjectData.subjectName)
+//        val list = mutableListOf<SubjectData>()
+//
+//        val dataReceived = ref.get().addOnFailureListener{
+//            trySend(false)
+//        }.await()
+//
+//        for(i in dataReceived.children)
+//        {
+//            list.add(i.getValue(SubjectData::class.java)!!)
+//        }
+//
+//        list.add(subjectData)
 
-        val dataReceived = ref.get().addOnFailureListener{
-            trySend(false)
-        }.await()
-
-        for(i in dataReceived.children)
-        {
-            list.add(i.getValue(SubjectData::class.java)!!)
-        }
-
-        list.add(subjectData)
-
-        ref.setValue(list).addOnFailureListener{
+        ref.setValue(subjectData).addOnFailureListener{
             trySend(false)
         }
 

@@ -22,6 +22,9 @@
         <action
             android:id="@+id/action_navigation_dashboard_to_attendanceFragment"
             app:destination="@id/attendanceFragment" />
+        <action
+            android:id="@+id/action_navigation_dashboard_to_createExamsFragment"
+            app:destination="@id/createExamsFragment" />
     </fragment>
 
     <fragment
@@ -53,4 +56,9 @@
             android:id="@+id/action_attendanceFragment_to_navigation_dashboard"
             app:destination="@id/navigation_dashboard" />
     </fragment>
+    <fragment
+        android:id="@+id/createExamsFragment"
+        android:name="com.sturec.sturecteacher.ui.dashboard.create_exmas.CreateExamsFragment"
+        android:label="fragment_create_exams"
+        tools:layout="@layout/fragment_create_exams" />
 </navigation>

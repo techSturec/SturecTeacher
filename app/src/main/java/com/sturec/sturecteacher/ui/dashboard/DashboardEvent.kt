@@ -5,4 +5,6 @@ sealed class DashboardEvent {
     object OnSubjectsButtonClicked: DashboardEvent()
     object OnAttendanceButtonClicked: DashboardEvent()
     object OnBulletinButtonClicked: DashboardEvent()
+
+    object OnCreateExamsButtonClicked: DashboardEvent()
 }

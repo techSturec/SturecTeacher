@@ -69,20 +69,20 @@ class AttendanceFragment : Fragment() {
         val viewModel = ViewModelProvider(this)[AttendanceViewModel::class.java]
         val root = binding.root
 
-        lifecycleScope.launch{
-            viewModel.uiEvents.collect{
-                when(it){
-                    is UiEvents.Navigate->{
+        lifecycleScope.launch {
+            viewModel.uiEvents.collect {
+                when (it) {
+                    is UiEvents.Navigate -> {
                         findNavController().navigate(it.actionId)
                     }
-                    is UiEvents.ShowSnackbar->{
+                    is UiEvents.ShowSnackbar -> {
                         Snackbar.make(
                             root,
                             it.message,
                             Snackbar.LENGTH_SHORT
                         ).show()
                     }
-                    else->{
+                    else -> {
 
                     }
                 }
@@ -98,7 +98,7 @@ class AttendanceFragment : Fragment() {
                     Surface(
                         modifier = Modifier.fillMaxSize(),
                         color = MaterialTheme.colorScheme.background
-                    ){
+                    ) {
                         AttendanceFragmentUI(viewModel)
                     }
                 }
@@ -117,9 +117,10 @@ fun AttendanceFragmentUI(
     val context = LocalContext.current
     val initialList = listOf(TeacherAssignedClassroomData())
 
-    var classroomList: State<List<TeacherAssignedClassroomData>> = viewModel.attendanceRepositoryImpl.getAssignedClassroomList().collectAsState(
-        initial = listOf(TeacherAssignedClassroomData())
-    )
+    var classroomList: State<List<TeacherAssignedClassroomData>> =
+        viewModel.attendanceRepositoryImpl.getAssignedClassroomList().collectAsState(
+            initial = listOf(TeacherAssignedClassroomData())
+        )
 
     var selectedButton by remember {
         mutableStateOf(initialList[0])
@@ -132,6 +133,9 @@ fun AttendanceFragmentUI(
     val mYearNow = mCalendar.get(Calendar.YEAR)
     val mMonthNow = mCalendar.get(Calendar.MONTH)
     val mDayNow = mCalendar.get(Calendar.DAY_OF_MONTH)
+    val mDate = remember {
+        mutableStateOf("$mDayNow-${mMonthNow + 1}-$mYearNow")
+    }
 
     val scope = rememberCoroutineScope()
 
@@ -139,13 +143,11 @@ fun AttendanceFragmentUI(
 //    val mDate = remember {
 //        mutableStateOf("$mDayNow/${mMonthNow+1}/$mYearNow")
 //    }
-    val mDate = remember {
-        mutableStateOf("$mDayNow-${mMonthNow+1}-$mYearNow")
-    }
+
     val datePickerDialog = DatePickerDialog(
         context,
         { _: DatePicker, mYear: Int, mMonth: Int, mDayOfMonth: Int ->
-            mDate.value = "$mDayOfMonth-${mMonth+1}-$mYear"
+            mDate.value = "$mDayOfMonth-${mMonth + 1}-$mYear"
         },
         mYearNow, mMonthNow, mDayNow
     )
@@ -153,7 +155,7 @@ fun AttendanceFragmentUI(
     ConstraintLayout(
         modifier = Modifier.fillMaxSize()
     ) {
-        val (bgCard, classRow, loadingIcon, datePicker,loadingIcon2, list, save) = createRefs()
+        val (bgCard, classRow, loadingIcon, datePicker, loadingIcon2, list, save) = createRefs()
         val bgCardGuideline = createGuidelineFromTop(0.12625f)
 
 
@@ -204,7 +206,7 @@ fun AttendanceFragmentUI(
             if (selectedButton == initialList[0]) {
                 selectedButton = classroomList.value[0]
             }
-            for(i in classroomList.value){
+            for (i in classroomList.value) {
                 Button(
                     onClick = {
                         selectedButton = i
@@ -245,7 +247,7 @@ fun AttendanceFragmentUI(
             )
         }
         //rest of UI
-        else{
+        else {
             val initialClassroomList = mutableListOf(ClassroomListStudentData())
             val listOfStudents = viewModel
                 .attendanceRepositoryImpl
@@ -254,12 +256,12 @@ fun AttendanceFragmentUI(
                     initial = initialClassroomList
                 ).value
 
-            var attendanceData = if(flag){
+            var attendanceData = if (flag) {
                 viewModel
                     .attendanceRepositoryImpl
                     .getSpecificDateAttendance(mDate.value, selectedButton)
                     .collectAsState(initial = null)
-            }else {
+            } else {
                 viewModel
                     .attendanceRepositoryImpl
                     .getSpecificDateAttendance(mDate.value, selectedButton)
@@ -267,8 +269,7 @@ fun AttendanceFragmentUI(
             }
 
 
-            if(listOfStudents!=initialClassroomList && attendanceData.value!=null)
-            {
+            if (listOfStudents != initialClassroomList && attendanceData.value != null) {
                 Button(
                     onClick = {
                         datePickerDialog.show()
@@ -276,7 +277,7 @@ fun AttendanceFragmentUI(
                     colors = ButtonDefaults.buttonColors(
                         containerColor = MaterialTheme.colorScheme.primary
                     ),
-                    modifier = Modifier.constrainAs(datePicker){
+                    modifier = Modifier.constrainAs(datePicker) {
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                         top.linkTo(classRow.bottom)
@@ -300,16 +301,16 @@ fun AttendanceFragmentUI(
                         }
                         .padding(start = 11.dp, end = 21.dp)
                 ) {
-                    items(listOfStudents.size){
-                        var status:String
+                    items(listOfStudents.size) {
+                        var status: String
 
-                            if(attendanceData.value!!.absentList.contains(listOfStudents[it].mail)){
-                                status = "absent"
-                            }else if(attendanceData.value!!.leaveList.contains(listOfStudents[it].mail)){
-                                status = "leave"
-                            }else {
-                                status = "present"
-                            }
+                        if (attendanceData.value!!.absentList.contains(listOfStudents[it].mail)) {
+                            status = "absent"
+                        } else if (attendanceData.value!!.leaveList.contains(listOfStudents[it].mail)) {
+                            status = "leave"
+                        } else {
+                            status = "present"
+                        }
 
 
                         TableItem(
@@ -328,7 +329,7 @@ fun AttendanceFragmentUI(
                         )
                     }
                 }
-                
+
                 FloatingActionButton(
                     onClick = {
                         scope.launch {
@@ -342,7 +343,7 @@ fun AttendanceFragmentUI(
                             viewModel.onEvent(AttendanceEvents.Navigate)
                         }
                     },
-                    modifier = Modifier.constrainAs(save){
+                    modifier = Modifier.constrainAs(save) {
                         bottom.linkTo(parent.bottom)
                         end.linkTo(parent.end)
                     }
@@ -354,7 +355,7 @@ fun AttendanceFragmentUI(
                 }
 
 
-            }else{
+            } else {
                 CircularProgressIndicator(
                     color = MaterialTheme.colorScheme.onPrimaryContainer,
                     modifier = Modifier.constrainAs(loadingIcon2) {
@@ -370,18 +371,17 @@ fun AttendanceFragmentUI(
 
 @Composable
 fun TableItem(
-    studentName:String,
+    studentName: String,
     status: String,
-    onAbsent:()->Unit,
-    onLeave:()->Unit,
-    onPresent:()->Unit
+    onAbsent: () -> Unit,
+    onLeave: () -> Unit,
+    onPresent: () -> Unit
 ) {
     var checkedOption by remember {
         mutableStateOf(status)
     }
 
-    if(status.isNotEmpty())
-    {
+    if (status.isNotEmpty()) {
         checkedOption = status
     }
 
@@ -389,7 +389,7 @@ fun TableItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 120.dp)
+            .defaultMinSize(minHeight = 80.dp)
             .padding(vertical = 11.dp),
         contentAlignment = Alignment.Center
     ) {
@@ -397,7 +397,7 @@ fun TableItem(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .defaultMinSize(minHeight = 120.dp),
+                .defaultMinSize(minHeight = 80.dp),
             verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.End
         ) {
@@ -410,7 +410,7 @@ fun TableItem(
                 elevation = CardDefaults.cardElevation(
                     defaultElevation = 10.dp
                 ),
-                modifier = Modifier.defaultMinSize(minHeight = 120.dp)
+                modifier = Modifier.defaultMinSize(minHeight = 80.dp)
             ) {
                 Row {
                     Spacer(modifier = Modifier.width(40.dp))
@@ -433,14 +433,14 @@ fun TableItem(
                             horizontalArrangement = Arrangement.SpaceEvenly
                         ) {
                             Switch(
-                                checked = checkedOption=="present",
+                                checked = checkedOption == "present",
                                 onCheckedChange = {
                                     onPresent()
 
-                                    if(checkedOption=="present") {
+                                    if (checkedOption == "present") {
                                         checkedOption = "absent"
                                         onAbsent()
-                                    }else{
+                                    } else {
                                         checkedOption = "present"
                                     }
                                 },
@@ -457,13 +457,12 @@ fun TableItem(
                             )
 
                             Switch(
-                                checked = checkedOption=="absent",
+                                checked = checkedOption == "absent",
                                 onCheckedChange = {
                                     onPresent()
-                                    if(checkedOption=="absent")
-                                    {
+                                    if (checkedOption == "absent") {
                                         checkedOption = "present"
-                                    }else {
+                                    } else {
                                         checkedOption = "absent"
                                         onAbsent()
                                     }
@@ -481,13 +480,12 @@ fun TableItem(
                             )
 
                             Switch(
-                                checked = checkedOption=="leave",
+                                checked = checkedOption == "leave",
                                 onCheckedChange = {
                                     onPresent()
-                                    if(checkedOption=="leave")
-                                    {
+                                    if (checkedOption == "leave") {
                                         checkedOption = "present"
-                                    }else{
+                                    } else {
                                         checkedOption = "leave"
                                         onLeave()
                                     }

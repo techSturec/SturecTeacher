@@ -172,6 +172,13 @@ fun ManageClassrooms(
                 ){
                     dashboardViewModel.onEvent(DashboardEvent.OnBulletinButtonClicked)
                 }
+
+                IconWithTitle(
+                    title = "Create Exams",
+                    imageResource = R.drawable.bulletin
+                ){
+                    dashboardViewModel.onEvent(DashboardEvent.OnCreateExamsButtonClicked)
+                }
             }
         }
     }

@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.sturec.sturecteacher.data.attendance.AttendanceRepositoryImpl
 import com.sturec.sturecteacher.data.bulletin.BulletinRepositoryImpl
 import com.sturec.sturecteacher.data.classroom_operations.ClassroomOperationsRepositoryImpl
+import com.sturec.sturecteacher.data.create_exams.ExamsRepositoryImpl
 import com.sturec.sturecteacher.data.subject_operations.SubjectOperationsRepositoryImpl
 import com.sturec.sturecteacher.data.user_data.UserDataDatabase
 import com.sturec.sturecteacher.data.user_data.UserDataRepositoryImpl
@@ -60,5 +61,17 @@ object AppModule {
         classroomOperationsRepositoryImpl: ClassroomOperationsRepositoryImpl)
     :AttendanceRepositoryImpl{
         return AttendanceRepositoryImpl(userDataDatabase.dao, classroomOperationsRepositoryImpl)
+    }
+
+    @Provides
+    @Singleton
+    fun provideExamsRepository(
+        classroomOperationsRepositoryImpl: ClassroomOperationsRepositoryImpl,
+        userDataDatabase: UserDataDatabase
+    ):ExamsRepositoryImpl{
+        return ExamsRepositoryImpl(
+            classroomOperationsRepositoryImpl,
+            userDataDatabase.dao
+        )
     }
 }

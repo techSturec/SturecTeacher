@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.callbackFlow
 import kotlinx.coroutines.tasks.await
 
 class ClassroomOperationsRepositoryImpl(
-    val userDataRepositoryImpl: UserDataRepositoryImpl
+    private val userDataRepositoryImpl: UserDataRepositoryImpl
 ) : ClassroomOperationsRepository {
 
     private val reference = FirebaseDatabase.getInstance().reference

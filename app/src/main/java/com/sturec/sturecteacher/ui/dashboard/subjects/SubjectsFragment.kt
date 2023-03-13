@@ -535,7 +535,7 @@ fun TableItem(
     Box(
         modifier = Modifier
             .fillMaxWidth()
-            .defaultMinSize(minHeight = 120.dp)
+            .defaultMinSize(minHeight = 80.dp)
             .padding(vertical = 11.dp),
         contentAlignment = Alignment.Center
     ) {

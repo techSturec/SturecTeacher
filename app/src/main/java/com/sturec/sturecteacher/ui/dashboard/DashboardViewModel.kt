@@ -50,6 +50,11 @@ class DashboardViewModel @Inject constructor(
                     _uiEvent.send(UiEvents.Navigate(R.id.action_navigation_dashboard_to_bulletinFragment))
                 }
             }
+            is DashboardEvent.OnCreateExamsButtonClicked->{
+                viewModelScope.launch {
+                    _uiEvent.send(UiEvents.Navigate(R.id.action_navigation_dashboard_to_createExamsFragment))
+                }
+            }
         }
     }
 }
